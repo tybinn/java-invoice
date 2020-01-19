@@ -36,19 +36,25 @@ public class Invoice {
 	}
 
 	public BigDecimal getTax() {
-		if(products.isEmpty()){
-			return BigDecimal.ZERO;
-		}
-		return null;
-	}
-
-	public BigDecimal getTotal() {
 		BigDecimal retVal = new BigDecimal(0);
 		if(products.isEmpty()){
 			return BigDecimal.ZERO;
 		}
-		for(Product product : products.keySet()){
-			retVal = retVal.add(product.getPrice().multiply(new BigDecimal(products.get(product).toString())));
+		else {
+			retVal = getGrossPrice();
+			retVal = retVal.subtract(getNetPrice());
+			return retVal;
+		}
+	}
+
+	public BigDecimal getGrossPrice() {
+		BigDecimal retVal = new BigDecimal(0);
+		if(products.isEmpty()){
+			return BigDecimal.ZERO;
+		}else {
+			for (Product product : products.keySet()) {
+				retVal = retVal.add(product.getPriceWithTax().multiply(new BigDecimal(products.get(product).toString())));
+			}
 		}
 		return retVal;
 	}

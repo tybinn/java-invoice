@@ -18,8 +18,13 @@ public class Invoice {
 		products.put(product, 1);
 	}
 
-	public void addProduct(Product product, Integer quantity) {
-		// TODO: implement
+	public void addProduct(Product product, Integer quantity) throws IllegalArgumentException {
+		if (quantity > 0){
+			products.put(product, quantity);
+		}else{
+			throw new IllegalArgumentException("Quantity must be greater then zero.");
+		}
+
 	}
 
 	public BigDecimal getNetPrice() {

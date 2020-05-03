@@ -1,6 +1,8 @@
 package pl.edu.agh.mwo.invoice;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -8,10 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.Invoice;
-import pl.edu.agh.mwo.invoice.product.DairyProduct;
-import pl.edu.agh.mwo.invoice.product.OtherProduct;
-import pl.edu.agh.mwo.invoice.product.Product;
-import pl.edu.agh.mwo.invoice.product.TaxFreeProduct;
+import pl.edu.agh.mwo.invoice.product.*;
 
 public class InvoiceTest {
     private Invoice invoice;
@@ -128,5 +127,40 @@ public class InvoiceTest {
         int number1 = new Invoice().getNumber();
         int number2 = new Invoice().getNumber();
         Assert.assertThat(number1, Matchers.lessThan(number2));
+    }
+    @Test
+    public void testPrintInvoice(){
+        Invoice invoiceToPrint = new Invoice();
+        String example = "Numer faktury: " + invoiceToPrint.getNumber() + "\n" + "Kozi Serek, 3, 30" + "\n" +"Owoce, 1, 200" + "\n" +  "Liczba pozycji: 2";
+        invoiceToPrint.addProduct(new TaxFreeProduct("Owoce", new BigDecimal("200")));
+        invoiceToPrint.addProduct(new DairyProduct("Kozi Serek", new BigDecimal("10")), 3);
+        Assert.assertEquals(example, invoiceToPrint.print());
+    }
+
+    @Test
+    public void testDuplicates(){
+        Invoice invoice2 = new Invoice();
+        invoice2.addProduct(new TaxFreeProduct("Zelki", new BigDecimal("10")),2);
+        invoice2.addProduct(new TaxFreeProduct("Zelki", new BigDecimal("10")),1);
+        Assert.assertEquals(invoice2.getProductAmountByName("Zelki"), 3);
+    }
+
+    @Test
+    public void testBottleOfWine(){
+        Invoice invoice2 = new Invoice();
+        invoice2.addProduct(new BottleOfWine("Komandos", new BigDecimal("5")), 1);
+        Assert.assertEquals(invoice2.getGrossTotal(),new BigDecimal("11.71") );
+    }
+    @Test
+    public void testFuelCanister(){
+        Invoice invoice2 = new Invoice();
+        invoice2.addProduct(new FuelCanister("Olej napedowy", new BigDecimal("5")), 1);
+        if (LocalDate.now().getMonth().equals(Month.APRIL) || LocalDate.now().getDayOfMonth() == 26){
+            Assert.assertEquals(invoice2.getGrossTotal(),new BigDecimal("6.15") );
+        }else {
+            Assert.assertEquals(invoice2.getGrossTotal(),new BigDecimal("11.71") );
+        }
+
+
     }
 }
